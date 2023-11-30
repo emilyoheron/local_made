@@ -1,18 +1,27 @@
-import AuthForm from './auth-form'
+'use client'
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
-export default function Home() {
+const PublicPage = () => {
+  const router = useRouter();
+
+  const handleArtistLogin = () => {
+    // Redirect to the artist login page
+    router.push('/login');
+  };
+
   return (
-    <div className="row">
-      <div className="col-6">
-        <h1 className="header">Local Made</h1>
-        <p className="">
-          Find local artisans!
-          Enter your email and follow the link to sign in.
-        </p>
-      </div>
-      <div className="col-6 auth-widget">
-        <AuthForm />
-      </div>
+    <div>
+      <header>
+        <h1>Artists Showcase</h1>
+        <button onClick={handleArtistLogin}>Artist Login</button>
+      </header>
+      {/* Display artists and their profiles here */}
+      <main>
+        {/* Your artist cards or listing go here */}
+      </main>
     </div>
-  )
-}
+  );
+};
+
+export default PublicPage;

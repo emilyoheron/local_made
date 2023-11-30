@@ -1,6 +1,7 @@
 'use client'
 import { useCallback, useEffect, useState } from 'react'
 import { Database } from '../lib/database.types'
+import Avatar from './avatar'
 import { Session, createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
 export default function AccountForm({ session }: { session: Session | null }) {
@@ -8,8 +9,10 @@ export default function AccountForm({ session }: { session: Session | null }) {
   const [loading, setLoading] = useState(true)
   const [fullname, setFullname] = useState<string | null>(null)
   const [username, setUsername] = useState<string | null>(null)
-  const [website, setWebsite] = useState<string | null>(null)
+  const [description, setDescription] = useState<string | null>(null)
   const [avatar_url, setAvatarUrl] = useState<string | null>(null)
+  const [postImage, setPostImage] = useState<File | null>(null);
+  const [postCaption, setPostCaption] = useState<string | null>(null);
   const user = session?.user
 
   const getProfile = useCallback(async () => {
@@ -18,7 +21,7 @@ export default function AccountForm({ session }: { session: Session | null }) {
 
       const { data, error, status } = await supabase
         .from('profiles')
-        .select(`full_name, username, website, avatar_url`)
+        .select(`full_name, username, description, avatar_url`)
         .eq('id', user?.id || '')
         .single()
 
@@ -29,7 +32,7 @@ export default function AccountForm({ session }: { session: Session | null }) {
       if (data) {
         setFullname(data.full_name)
         setUsername(data.username)
-        setWebsite(data.website)
+        setDescription(data.description)
         setAvatarUrl(data.avatar_url)
       }
     } catch (error) {
@@ -45,12 +48,12 @@ export default function AccountForm({ session }: { session: Session | null }) {
 
   async function updateProfile({
     username,
-    website,
+    description,
     avatar_url,
   }: {
     username: string | null
     fullname: string | null
-    website: string | null
+    description: string | null
     avatar_url: string | null
   }) {
     try {
@@ -60,7 +63,7 @@ export default function AccountForm({ session }: { session: Session | null }) {
         id: user?.id as string,
         full_name: fullname,
         username,
-        website,
+        description,
         avatar_url,
         updated_at: new Date().toISOString(),
       })
@@ -72,9 +75,72 @@ export default function AccountForm({ session }: { session: Session | null }) {
       setLoading(false)
     }
   }
+  const handlePostUpload: React.ChangeEventHandler<HTMLInputElement> = async (event) => {
+    try {
+      if (!event.target.files || event.target.files.length === 0) {
+        throw new Error('You must select an image to upload.');
+      }
 
+      const file = event.target.files[0];
+      setPostImage(file);
+    } catch (error) {
+      alert('Error uploading post image!');
+    }
+  };
+
+  const handlePostCaptionChange: React.ChangeEventHandler<HTMLInputElement> = (event) => {
+    setPostCaption(event.target.value);
+  };
+
+  const handlePostSubmit = async () => {
+    try {
+      setLoading(true);
+
+      // Upload post image to storage
+      const fileExt = postImage?.name.split('.').pop();
+      const postImageFilePath = `${user?.id}-${Date.now()}.${fileExt}`;
+      const { error: uploadError } = await supabase.storage
+        .from('posts')
+        .upload(postImageFilePath, postImage!);
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      // Insert post data into the 'posts' table
+      const { error: insertError } = await supabase.from('posts').upsert([
+        {
+          user_id: user?.id as string,
+          image_url: postImageFilePath,
+          caption: postCaption,
+          created_at: new Date().toISOString(),
+        },
+      ]);
+
+      if (insertError) {
+        throw insertError;
+      }
+
+      alert('Post uploaded successfully!');
+    } catch (error) {
+      alert('Error uploading post!');
+    } finally {
+      setLoading(false);
+      setPostImage(null);
+      setPostCaption(null);
+    }
+  };
   return (
     <div className="form-widget">
+      <Avatar
+        uid={user?.id as string}
+        url={avatar_url}
+        size={150}
+        onUpload={(url) => {
+          setAvatarUrl(url)
+          updateProfile({ fullname, username, description, avatar_url: url })
+        }}
+        />
       <div>
         <label htmlFor="email">Email</label>
         <input id="email" type="text" value={session?.user.email} disabled />
@@ -98,19 +164,19 @@ export default function AccountForm({ session }: { session: Session | null }) {
         />
       </div>
       <div>
-        <label htmlFor="website">Website</label>
+        <label htmlFor="description">Description</label>
         <input
-          id="website"
-          type="url"
-          value={website || ''}
-          onChange={(e) => setWebsite(e.target.value)}
+          id="description"
+          type="text"
+          value={description || ''}
+          onChange={(e) => setDescription(e.target.value)}
         />
       </div>
 
       <div>
         <button
           className="button primary block"
-          onClick={() => updateProfile({ fullname, username, website, avatar_url })}
+          onClick={() => updateProfile({ fullname, username, description, avatar_url })}
           disabled={loading}
         >
           {loading ? 'Loading ...' : 'Update'}
@@ -123,6 +189,34 @@ export default function AccountForm({ session }: { session: Session | null }) {
             Sign out
           </button>
         </form>
+      </div>
+      <div>
+        <label htmlFor="postImage">Post Image</label>
+        <input
+          id="postImage"
+          type="file"
+          accept="image/*"
+          onChange={handlePostUpload}
+          disabled={loading}
+        />
+      </div>
+      <div>
+        <label htmlFor="postCaption">Post Caption</label>
+        <input
+          id="postCaption"
+          type="text"
+          value={postCaption || ''}
+          onChange={handlePostCaptionChange}
+        />
+      </div>
+      <div>
+        <button
+          className="button primary block"
+          onClick={handlePostSubmit}
+          disabled={!postImage || !postCaption || loading}
+        >
+          {loading ? 'Uploading Post...' : 'Upload Post'}
+        </button>
       </div>
     </div>
   )
