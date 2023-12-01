@@ -20,10 +20,16 @@ const topRightButtonsStyle: React.CSSProperties = {
   right: '16px',
 };
 
-const profileContainerStyle: CSSProperties = {
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
+const profileContainerStyleWithBorder = {
+  border: '1px solid #000', // Add your desired border style here
+  marginBottom: '10px', // Optional: Add some margin for spacing between profiles
+  padding: '10px', // Optional: Add padding for spacing within the container
+};
+
+const profileContainerStyle = {
+  width: '900px',  // Set a fixed width for the entire profile box
+  marginBottom: '10px', // Optional: Add some margin for spacing between profiles
+  padding: '10px', // Optional: Add padding for spacing within the container
 };
 
 const profileListItemStyle: CSSProperties = {
@@ -100,25 +106,29 @@ const PublicProfiles = () => {
     <div style={centerContainerStyle}>
       <h2>Artists</h2>
       {publicProfiles.map(({ profile, posts }) => (
-        <div key={profile.username} style={profileContainerStyle}>
-          <div style={profileListItemStyle}>
-            <p>User: {profile.username}</p>
-            <p>{profile.job_role}</p>
-            <p>Location: {profile.location}</p>
-            <p>{profile.description}</p>
-          </div>
-          <div style={postListStyle}>
-            {posts.map((post) => (
-              <div key={post.id} style={postListItemStyle}>
-                <PostImage postId={post.id} url={post.image_url} size={200} />
-                <p>{post.caption}</p>
-              </div>
-            ))}
+        <div key={profile.username} style={profileContainerStyleWithBorder}>
+          <div style={profileContainerStyle}>
+            <div style={profileListItemStyle}>
+              <p>User: {profile.username}</p>
+              <p>{profile.job_role}</p>
+              <p>Location: {profile.location}</p>
+              <p>{profile.description}</p>
+            </div>
+            <div style={postListStyle}>
+              {posts.map((post) => (
+                <div key={post.id} style={postListItemStyle}>
+                  <PostImage postId={post.id} url={post.image_url} size={200} />
+                  <p>{post.caption}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       ))}
     </div>
   );
+  
+  
 }
 
 const PublicPage = () => {
