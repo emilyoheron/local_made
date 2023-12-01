@@ -21,6 +21,7 @@ export default function AccountForm({ session }: { session: Session | null }) {
   const [userPosts, setUserPosts] = useState<Tables<'posts'>[]>([]);
   const [location, setLocation] = useState<string | null>(null);
   const [jobRole, setJobRole] = useState<string | null>(null);
+  const [publicProfile, setPublicProfile] = useState<boolean>(false);
 
   const user = session?.user
 
@@ -30,7 +31,7 @@ export default function AccountForm({ session }: { session: Session | null }) {
 
       const { data, error, status } = await supabase
         .from('profiles')
-        .select(`full_name, username, description, avatar_url, location, location, job_role`)
+        .select(`full_name, username, description, avatar_url, location, location, job_role, public_profile`)
         .eq('id', user?.id || '')
         .single()
 
@@ -45,6 +46,7 @@ export default function AccountForm({ session }: { session: Session | null }) {
         setAvatarUrl(data.avatar_url)
         setLocation(data.location);
         setJobRole(data.job_role);
+        setPublicProfile(data.public_profile || false);
       }
     } catch (error) {
       alert('Error loading user data!')
@@ -64,6 +66,7 @@ export default function AccountForm({ session }: { session: Session | null }) {
     avatar_url,
     location,
     jobRole,
+    publicProfile,
   }: {
     username: string | null
     fullname: string | null
@@ -71,6 +74,7 @@ export default function AccountForm({ session }: { session: Session | null }) {
     avatar_url: string | null
     location: string | null;
     jobRole: string | null;
+    publicProfile: boolean;
   }) {
     try {
       setLoading(true)
@@ -83,6 +87,7 @@ export default function AccountForm({ session }: { session: Session | null }) {
         avatar_url,
         location,
         job_role: jobRole,
+        public_profile: publicProfile,
         updated_at: new Date().toISOString(),
       })
       if (error) throw error
@@ -98,7 +103,6 @@ export default function AccountForm({ session }: { session: Session | null }) {
     try {
       setLoading(true);
       console.log('Deleting post:', postId);
-
       // Delete post image from storage
       const postToDelete = userPosts.find((post) => post.id === postId);
       if (postToDelete) {
@@ -220,15 +224,29 @@ export default function AccountForm({ session }: { session: Session | null }) {
 
   return (
     <div className="form-widget">
-      <Avatar
-        uid={user?.id as string}
-        url={avatar_url}
-        size={150}
-        onUpload={(url) => {
-          setAvatarUrl(url)
-          updateProfile({ fullname, username, description, avatar_url: url, location, jobRole})
-        }}
-        />
+      <div className="top-right-buttons">
+        <form action="/auth/signout" method="post">
+          <button className="button block" type="submit">
+            Sign out
+          </button>
+        </form>
+        <button
+          className="button block"
+          onClick={() => router.push('/')}
+          >
+          Back
+        </button>
+      </div>
+      <div>
+        <label>
+          <input
+            type="checkbox"
+            checked={publicProfile}
+            onChange={() => setPublicProfile(!publicProfile)} // Step 4: Handle checkbox change event
+          />
+          Make profile public
+        </label>
+      </div>
       <div>
         <label htmlFor="email">Email</label>
         <input id="email" type="text" value={session?.user.email} disabled />
@@ -282,19 +300,11 @@ export default function AccountForm({ session }: { session: Session | null }) {
       <div>
         <button
           className="button primary block"
-          onClick={() => updateProfile({ fullname, username, description, avatar_url, location, jobRole})}
+          onClick={() => updateProfile({ fullname, username, description, avatar_url, location, jobRole, publicProfile,})}
           disabled={loading}
         >
           {loading ? 'Loading ...' : 'Update'}
         </button>
-      </div>
-
-      <div>
-        <form action="/auth/signout" method="post">
-          <button className="button block" type="submit">
-            Sign out
-          </button>
-        </form>
       </div>
       <div>
         <label htmlFor="postImage">Post Image</label>
@@ -327,13 +337,13 @@ export default function AccountForm({ session }: { session: Session | null }) {
       {userPosts.length > 0 && (
         <div>
           <h2>Your Posts</h2>
-          <ul>
+          <ul style={{ listStyleType: 'none', padding: 0 }}>
             {userPosts.map((post) => (
-              <li key={post.id}>
-                <PostImage postId={post.id} url={post.image_url} size={100} />
-                <p>{post.caption}</p>
-                <button onClick={() => deletePost(post.id)}>Delete Post</button>
-              </li>
+            <li key={post.id} style={{ border: '1px solid #ccc', borderRadius: '8px', marginBottom: '16px', padding: '16px' }}>
+              <PostImage postId={post.id} url={post.image_url} size={100} />
+              <p>{post.caption}</p>
+              <button onClick={() => deletePost(post.id)}>Delete Post</button>
+            </li>
             ))}
           </ul>
         </div>

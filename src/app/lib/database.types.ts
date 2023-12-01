@@ -56,6 +56,7 @@ export interface Database {
           id: string
           job_role: string | null
           location: string | null
+          public_profile: boolean | null
           updated_at: string | null
           username: string | null
         }
@@ -66,6 +67,7 @@ export interface Database {
           id: string
           job_role?: string | null
           location?: string | null
+          public_profile?: boolean | null
           updated_at?: string | null
           username?: string | null
         }
@@ -76,6 +78,7 @@ export interface Database {
           id?: string
           job_role?: string | null
           location?: string | null
+          public_profile?: boolean | null
           updated_at?: string | null
           username?: string | null
         }

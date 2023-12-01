@@ -2,13 +2,13 @@ html,
 body {
   --custom-font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
     Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
-  --custom-bg-color: #101010;
-  --custom-panel-color: #222;
-  --custom-box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.8);
-  --custom-color: #fff;
-  --custom-color-brand: #24b47e;
-  --custom-color-secondary: #666;
-  --custom-border: 1px solid #333;
+  --custom-bg-color: #f4f4f4;
+  --custom-panel-color: #eee;
+  --custom-box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.2);
+  --custom-color: #333;
+  --custom-color-brand: #007bff;
+  --custom-color-secondary: #999;
+  --custom-border: 1px solid #ddd;
   --custom-border-radius: 5px;
   --custom-spacing: 5px;
 
@@ -182,7 +182,7 @@ input {
   padding: 8px;
   font-size: 0.9rem;
   background-color: var(--custom-bg-color);
-  color: white;
+  color: black;
 }
 
 input[disabled] {
@@ -238,9 +238,9 @@ input[disabled] {
 
 button,
 .button {
-  color: var(--custom-color);
+  color: #fff; /* White text color */
   border: var(--custom-border);
-  background-color: var(--custom-bg-color);
+  background-color: var(--custom-color-brand);
   display: inline-block;
   text-align: center;
   border-radius: var(--custom-border-radius);
@@ -253,8 +253,20 @@ button,
 
 button.primary,
 .button.primary {
-  background-color: var(--custom-color-brand);
-  border: 1px solid var(--custom-color-brand);
+  background-color: #0056b3; /* Darker blue color for primary button */
+  border: 1px solid #0056b3;
+}
+
+.top-right-buttons {
+  display: flex;
+  gap: 10px;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.button.block {
+  width: 100%;
 }
 
 /* Widgets */
