@@ -20,20 +20,33 @@ const topRightButtonsStyle: React.CSSProperties = {
   right: '16px',
 };
 
-// Styling for the white border around each profile
-const profileListItemStyle = {
-  border: '1px solid black',
-  borderRadius: '8px', // Optional: Add border radius for rounded corners
-  padding: '16px', // Optional: Add padding for space around each profile
-  margin: '8px 0', // Optional: Add margin for space between profiles
+const profileContainerStyle: CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
 };
 
-// Styling for the border around each post in PublicProfiles
-const postListItemStyle = {
-  border: '1px solid #ccc',
+const profileListItemStyle: CSSProperties = {
+  border: '1px solid black',
   borderRadius: '8px',
   padding: '16px',
-  marginRight: '16px', // Add margin between posts
+  margin: '8px 0',
+};
+
+const postListStyle: CSSProperties = {
+  display: 'flex',
+  flexDirection: 'row',
+  flexWrap: 'wrap', // Allow posts to wrap to the next row
+  justifyContent: 'center', // Center posts horizontally
+  gap: '16px', // Add gap between posts
+  marginTop: '16px', // Add margin between profile and posts
+};
+
+const postListItemStyle: CSSProperties = {
+  borderRadius: '8px',
+  padding: '16px',
+  margin: '8px',
+  width: '200px', // Set a fixed width for each post
 };
 
 // Create a new functional component to display public profiles
@@ -87,12 +100,14 @@ const PublicProfiles = () => {
     <div style={centerContainerStyle}>
       <h2>Artists</h2>
       {publicProfiles.map(({ profile, posts }) => (
-        <div key={profile.username} style={profileListItemStyle}>
-          <p>User: {profile.username}</p>
-          <p>{profile.job_role}</p>
-          <p>Location: {profile.location}</p>
-          <p>{profile.description}</p>
-          <div style={{ display: 'flex', listStyleType: 'none', padding: 0 }}>
+        <div key={profile.username} style={profileContainerStyle}>
+          <div style={profileListItemStyle}>
+            <p>User: {profile.username}</p>
+            <p>{profile.job_role}</p>
+            <p>Location: {profile.location}</p>
+            <p>{profile.description}</p>
+          </div>
+          <div style={postListStyle}>
             {posts.map((post) => (
               <div key={post.id} style={postListItemStyle}>
                 <PostImage postId={post.id} url={post.image_url} size={200} />
@@ -104,7 +119,7 @@ const PublicProfiles = () => {
       ))}
     </div>
   );
-};
+}
 
 const PublicPage = () => {
   const router = useRouter();

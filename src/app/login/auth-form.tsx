@@ -14,6 +14,7 @@ export default function AuthForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const isEmailValid = (email: string) => {
     // You can use a more sophisticated email validation regex if needed
@@ -27,6 +28,7 @@ export default function AuthForm() {
 
   const handleSignUp = async () => {
     try {
+      setError(null)
       if (!isEmailValid(email)) {
         throw new Error('Invalid email format');
       }
@@ -42,7 +44,8 @@ export default function AuthForm() {
           emailRedirectTo: `${location.origin}/auth/callback`,
         },
       });
-      router.refresh();
+
+      setSuccessMessage('Check your email for a confirmation link.');
     } catch (error: any) {
       if (error.message === 'Invalid email format') {
         setError('Invalid email format. Please enter a valid email address.');
@@ -56,6 +59,7 @@ export default function AuthForm() {
 
   const handleSignIn = async () => {
     try {
+      setError(null)
       await supabase.auth.signInWithPassword({
         email,
         password,
@@ -95,6 +99,7 @@ export default function AuthForm() {
         <button onClick={handleSignUp}>Sign up</button>
         <button onClick={handleSignIn}>Sign in</button>
         {error && <p style={{ color: 'red' }}>{error}</p>}
+        {successMessage && <p style={{ color: 'green' }}>{successMessage}</p>}
       </>
     );
   } else {
