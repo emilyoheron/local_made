@@ -13,21 +13,21 @@ export interface Database {
         Row: {
           caption: string | null
           created_at: string
-          id: number
+          id: string
           image_url: string
           user_id: string
         }
         Insert: {
           caption?: string | null
           created_at?: string
-          id?: number
+          id: string
           image_url: string
           user_id: string
         }
         Update: {
           caption?: string | null
           created_at?: string
-          id?: number
+          id?: string
           image_url?: string
           user_id?: string
         }
@@ -54,6 +54,8 @@ export interface Database {
           description: string | null
           full_name: string | null
           id: string
+          job_role: string | null
+          location: string | null
           updated_at: string | null
           username: string | null
         }
@@ -62,6 +64,8 @@ export interface Database {
           description?: string | null
           full_name?: string | null
           id: string
+          job_role?: string | null
+          location?: string | null
           updated_at?: string | null
           username?: string | null
         }
@@ -70,6 +74,8 @@ export interface Database {
           description?: string | null
           full_name?: string | null
           id?: string
+          job_role?: string | null
+          location?: string | null
           updated_at?: string | null
           username?: string | null
         }
